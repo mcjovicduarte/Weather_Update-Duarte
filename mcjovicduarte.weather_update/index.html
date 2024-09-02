@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Update</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #544365; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        .container {
+            background-color: #867BA3; 
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #000000; 
+        }
+
+        #search-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        #city-input {
+            padding: 10px;
+            font-size: 16px;
+            width: 70%;
+            border-radius: 5px 0 0 5px;
+            border: 1px solid #ccc;
+        }
+
+        #search-btn {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 0 5px 5px 0;
+            border: 1px solid #ccc;
+            background-color: #e0e0e0; 
+            color: #333;
+            cursor: pointer;
+        }
+
+        #search-btn:hover {
+            background-color: #d0d0d0; 
+        }
+
+        #weather-info {
+            font-size: 16px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Weather Update</h1>
+        <div id="search-bar">
+            <input type="text" id="city-input" placeholder="Enter city name">
+            <button id="search-btn">Search</button>
+        </div>
+        <div id="weather-info">
+            <p>Loading weather data...</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const apiKey = 'd6af79658fb947a590563420241908';
+            let cityName = 'Cagayan De Oro'; 
+
+            async function fetchWeather(city) {
+                document.getElementById('weather-info').innerHTML = '<p>Loading weather data...</p>'; // Display loading message
+                
+                const apiEndpoint = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}`;
+
+                try {
+                    const response = await fetch(apiEndpoint);
+                    if (!response.ok) throw new Error('City not found');
+                    const weatherData = await response.json();
+
+                    const temperatureInCelsius = weatherData.current.temp_c;
+                    const weatherDescription = weatherData.current.condition.text;
+                    const humidityLevel = weatherData.current.humidity;
+
+                    document.getElementById('weather-info').innerHTML = `
+                        <h2>Weather in ${city}</h2>
+                        <p><strong>Temperature:</strong> ${temperatureInCelsius}°C</p>
+                        <p><strong>Weather:</strong> ${weatherDescription}</p>
+                        <p><strong>Humidity:</strong> ${humidityLevel}%</p>
+                    `;
+                } catch (error) {
+                    document.getElementById('weather-info').innerHTML = `<p>Unable to retrieve weather data: ${error.message}</p>`;
+                }
+            }
+            fetchWeather(cityName);
+
+            document.getElementById('search-btn').addEventListener('click', function() {
+                cityName = document.getElementById('city-input').value.trim();
+                if (cityName) {
+                    fetchWeather(cityName);
+                } else {
+                    alert("Please enter a city name.");
+                }
+            });
+
+            document.getElementById('city-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    cityName = document.getElementById('city-input').value.trim();
+                    if (cityName) {
+                        fetchWeather(cityName);
+                    } else {
+                        alert("Please enter a city name.");
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
